@@ -1,5 +1,8 @@
+use server::Server;
+use http::request;
+
 fn main() {
-    let server = server::Server::new(String::from("127.0.0.1:8080"));
+    let server = Server::new(String::from("127.0.0.1:8080"));
     server.run();
 }
 
@@ -22,19 +25,27 @@ fn main() {
 
  }
 
-struct Request {
-    path: String,
-    query_string: Option<String>, // none or Some<T>
-    method: Method,
-}
+ mod http {
+    pub mod request {
+        use super::method::Method;
+        pub struct Request {
+            path: String,
+            query_string: Option<String>, // none or Some<T>
+            method: Method,
+        }
+    }
+    
+    pub mod method {
+        pub enum Method {
+            GET,
+            POST,
+            DELETE,
+            PUT,
+            PATCH,
+            OPTIONS,
+            HEAD,
+            TRACE
+        }
+    }
+ }
 
-enum Method {
-    GET,
-    POST,
-    DELETE,
-    PUT,
-    PATCH,
-    OPTIONS,
-    HEAD,
-    TRACE
-}
