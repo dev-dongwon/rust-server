@@ -14,6 +14,10 @@ impl Server {
     pub fn run(self) {
         println!("Listening on {}", self.addr);
       
-        let listener: Result<TcpListener, std::io::Error> = TcpListener::bind(self.addr);
+        let _listener: TcpListener = TcpListener::bind(self.addr).unwrap();
+
+        loop {
+          _listener.accept();
+        }
     }
 }
