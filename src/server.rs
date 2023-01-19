@@ -17,7 +17,20 @@ impl Server {
         let _listener: TcpListener = TcpListener::bind(self.addr).unwrap();
 
         loop {
-          _listener.accept();
+          match _listener.accept() {
+            Ok((stream, _)) => {
+              println!("ok");
+            },
+            Err(e) => println!("Failed to establish connection: {}", e)
+          }
+
+          let res: Result<(std::net::TcpStream, std::net::SocketAddr), std::io::Error> = _listener.accept();
+
+          if res.is_err() {
+            continue;
+          }
+
+          let (stream, addr) = res.unwrap();
         }
     }
 }
