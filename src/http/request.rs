@@ -1,5 +1,6 @@
 use std::str::Utf8Error;
 use super::Method;
+use super::method::MethodError;
 use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{ Display, Formatter, Result as fmtResult, Debug };
@@ -32,6 +33,9 @@ impl TryFrom<&[u8]> for Request {
             return Err(ParseError::InvalidProtocol);
         }
 
+        let method: Method = method.parse()?;
+        // let mut query_string = None;
+
         unimplemented!();
     }
 }
@@ -62,6 +66,12 @@ impl ParseError {
             Self::InvalidProtocol => "Invalid Protocol",
             Self::InvalidMethod => "Invalid Method",
         }
+    }
+}
+
+impl From<MethodError> for ParseError {
+    fn from(_: MethodError) -> Self {
+        Self::InvalidMethod
     }
 }
 
