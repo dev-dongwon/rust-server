@@ -11,19 +11,40 @@ pub struct Request {
     method: Method,
 }
 
-
+// GET /something?name=some HTTP/1.1\r\n..HEADERS..
 impl TryFrom<&[u8]> for Request {
     type Error = ParseError;
 
     fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
         let request = str::from_utf8(buf)?;
+
+        // match get_next_word(request) {
+        //     Some((method, request)) => {}
+        //     None => return Err(ParseError::InvalidRequest)
+        // }
+
+        // 기능적으로 위 구문과 같음. 하지만 더 깔끔!
+        let (method, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
+        let (path, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
+        let (protocol, _) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
+
+        if protocol != "HTTP/1.1" {
+            return Err(ParseError::InvalidProtocol);
+        }
+
         unimplemented!();
     }
 }
 
 // option은 말 그대로 optionable한 value 지칭
 fn get_next_word(request: &str) -> Option<(&str, &str)> {
-    unimplemented!();
+    for (i, c) in request.char_indices() {
+        if c == ' ' || c == '\r' {
+            return Some((&request[..i], &request[i + 1..]))
+        }
+    }
+
+    None
 }
 
 pub enum ParseError {
