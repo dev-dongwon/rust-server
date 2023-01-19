@@ -1,7 +1,9 @@
+use std::str::Utf8Error;
 use super::Method;
 use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{ Display, Formatter, Result as fmtResult, Debug };
+use std::str;
 
 pub struct Request {
     path: String,
@@ -9,15 +11,19 @@ pub struct Request {
     method: Method,
 }
 
-// impl Request {
-//     fn from_byte_array(buf: &[u8]) -> Result<Self, String> {}
-// }
 
 impl TryFrom<&[u8]> for Request {
     type Error = ParseError;
+
     fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
+        let request = str::from_utf8(buf)?;
         unimplemented!();
     }
+}
+
+// option은 말 그대로 optionable한 value 지칭
+fn get_next_word(request: &str) -> Option<(&str, &str)> {
+    unimplemented!();
 }
 
 pub enum ParseError {
@@ -35,6 +41,12 @@ impl ParseError {
             Self::InvalidProtocol => "Invalid Protocol",
             Self::InvalidMethod => "Invalid Method",
         }
+    }
+}
+
+impl From<Utf8Error> for ParseError {
+    fn from(_: Utf8Error) -> Self {
+        Self::InvalidEncoding
     }
 }
 
