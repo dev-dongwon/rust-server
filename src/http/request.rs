@@ -6,7 +6,7 @@ use std::error::Error;
 use std::fmt::{ Display, Formatter, Result as fmtResult, Debug };
 use std::str;
 
-// 
+#[derive(Debug)]
 pub struct Request<'buf> {
     path: &'buf str,
     query_string: Option<&'buf str>, // none or Some<T>

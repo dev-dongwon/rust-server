@@ -33,7 +33,9 @@ impl Server {
 
                   // 구현한 tryFrom에 위 스트림 버퍼를 넣고 정상동작이면 패스, 에러면 에러 메시지를 프린트
                   match Request::try_from(&buffer[..]) {
-                    Ok(request) => {},
+                    Ok(request) => {
+                      dbg!(request);
+                    },
                     Err(e) => println!("Failed to parse Request: {}", e)
                   }
 
