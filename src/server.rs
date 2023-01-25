@@ -1,4 +1,4 @@
-use crate::http::{ Request, Response, StatusCode };
+use crate::http::{ Request, Response, StatusCode, response };
 use std::convert::TryFrom;
 use std::net::TcpListener;
 use std::io::{Write, Read};
@@ -31,19 +31,23 @@ impl Server {
                   println!("Received a request:{}", String::from_utf8_lossy(&buffer));
 
                   // 구현한 tryFrom에 위 스트림 버퍼를 넣고 정상동작이면 패스, 에러면 에러 메시지를 프린트
-                  match Request::try_from(&buffer[..]) {
+                  let response = match Request::try_from(&buffer[..]) {
                     Ok(request) => {
                       dbg!(request);
-                      let response = Response::new(
+                      Response::new(
                         StatusCode::Ok,
                         Some("<h1>hi, there</h1>".to_string())
                       );
+                    }
+                    Err(e) => {
+                      println!("Failed to parse Request: {}", e);
+                      Response::new(StatusCode::BadRequest, None);
+                    }
+                  };
 
-                      response.send(&mut stream);
-                    },
-                    Err(e) => println!("Failed to parse Request: {}", e)
+                  if let Err(e) = response.send(&mut stream) {
+                    println!("Failed to send response: {}", e)
                   }
-
                 }
                 Err(e) => println!("Failed to read from connection: {}", e),
               }
