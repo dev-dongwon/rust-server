@@ -13,7 +13,10 @@ impl Response {
         Response { status_code, body }
     }
 
-    pub fn send(&self, stream: &mut impl Write) -> IoResult<()> {
+    // dynamic dispatch 라는 개념이 있구나! 를 알아야됨
+    // 함수가 Write 특성을 구현하는 타입을 반환한다는 것만 알면 되고, 특별히 어떤 타입이 반환될지에 대해서는 알 필요 없음
+    // 이런 방식은 유연성을 확보할 수 있음
+    pub fn send(&self, stream: &mut dyn Write) -> IoResult<()> {
         let body = match &self.body {
             Some(b) => b,
             None => "",
