@@ -1,7 +1,16 @@
-use crate::http::{ Request, Response, StatusCode, response };
+use crate::http::{ Request, Response, StatusCode, response, ParseError };
 use std::convert::TryFrom;
 use std::net::TcpListener;
 use std::io::{Write, Read};
+
+pub trait Handler {
+  fn handle_request(&mut self, request: &Request) -> Response;
+  // default로 트레잇에 직접 선언 가능, 물론 override도 가능.
+  fn handle_bad_request(&mut self, e: &ParseError) -> Response {
+    println!("Failed to parse request: {}", e);
+    Response::new(StatusCode::BadRequest, None)
+}
+}
 
 pub struct Server {
     addr: String,
@@ -16,7 +25,7 @@ impl Server {
         }
     }
 
-    pub fn run(self) {
+    pub fn run(self, mut handler: impl Handler) {
         println!("Listening on {}", self.addr);
       
         let _listener: TcpListener = TcpListener::bind(self.addr).unwrap();
@@ -32,17 +41,8 @@ impl Server {
 
                   // 구현한 tryFrom에 위 스트림 버퍼를 넣고 정상동작이면 패스, 에러면 에러 메시지를 프린트
                   let response = match Request::try_from(&buffer[..]) {
-                    Ok(request) => {
-                      dbg!(request);
-                      Response::new(
-                        StatusCode::Ok,
-                        Some("<h1>hi, there</h1>".to_string())
-                      );
-                    }
-                    Err(e) => {
-                      println!("Failed to parse Request: {}", e);
-                      Response::new(StatusCode::BadRequest, None);
-                    }
+                    Ok(request) => handler.handle_request(&request),
+                    Err(e) => handler.handle_bad_request(&e),
                   };
 
                   if let Err(e) = response.send(&mut stream) {
