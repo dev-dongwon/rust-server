@@ -52,18 +52,18 @@ impl<'buf>  TryFrom<&'buf [u8]> for Request<'buf> {
 
         let method: Method = method.parse()?;
 
-        let mut query_string: Option<&str> = None;
-        // ?가 있으면 쿼리 스트링이 있음
+        let mut query_string = None;
         if let Some(i) = path.find('?') {
-            query_string = Some(&path[i + 1..]);
+            query_string = Some(QueryString::from(&path[i + 1..]));
             path = &path[..i];
         }
 
         Ok(Self {
             path,
             query_string,
-            method
+            method,
         })
+
     }
 }
 
