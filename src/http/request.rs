@@ -1,6 +1,7 @@
 use std::str::Utf8Error;
 use super::Method;
 use super::method::MethodError;
+use super::query_string::QueryString;
 use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{ Display, Formatter, Result as fmtResult, Debug };
@@ -9,8 +10,23 @@ use std::str;
 #[derive(Debug)]
 pub struct Request<'buf> {
     path: &'buf str,
-    query_string: Option<&'buf str>, // none or Some<T>
-    method: Method,
+    query_string: Option<QueryString<'buf>>, // none or Some<T>
+    method: Method
+}
+
+impl<'buf> Request<'buf> {
+    pub fn path(&self) -> &str {
+        &self.path
+    }
+
+    pub fn method(&self) -> &Method {
+        &self.method
+    }
+
+    pub fn query_string(&self) -> Option<&QueryString> {
+        // as_ref -> Converts from &Option<T> to Option<&T>. 말 그대로 참조만 해준다
+        self.query_string.as_ref()
+    }
 }
 
 // GET /something?name=some HTTP/1.1\r\n..HEADERS..
