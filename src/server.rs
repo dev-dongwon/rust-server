@@ -1,7 +1,7 @@
-use crate::http::{ Request, Response, StatusCode, response, ParseError };
+use crate::http::{ Request, Response, StatusCode, ParseError };
 use std::convert::TryFrom;
 use std::net::TcpListener;
-use std::io::{Write, Read};
+use std::io::{Read};
 
 pub trait Handler {
   fn handle_request(&mut self, request: &Request) -> Response;
@@ -15,8 +15,6 @@ pub trait Handler {
 pub struct Server {
     addr: String,
 }
-
-fn arr(a: [u8; 5]) {}
 
 impl Server {
     pub fn new(addr: String) -> Self {
@@ -54,14 +52,6 @@ impl Server {
             },
             Err(e) => println!("Failed to establish connection: {}", e)
           }
-
-          let res: Result<(std::net::TcpStream, std::net::SocketAddr), std::io::Error> = _listener.accept();
-
-          if res.is_err() {
-            continue;
-          }
-
-          let (stream, addr) = res.unwrap();
         }
     }
 }
